@@ -7,25 +7,31 @@ import utils
 
 include config_helpers
 
-const APPNAME : string = "gungeon-log-database"
+const GLD_APPNAME* : string = "gungeon-log-database"
+const GLD_VERSION* : string = "0.1.0"
 
 const modToNamespace* : Table[string, string] = {
   # known mods with known namespaces
+  "+ The Dimension Hopper +"                     : "DimensionHopper",
   "A Bleaker Item Pack"                          : "BleakMod",
   "Alexandria"                                   : "Alexandria",
   "All Floors Safety"                            : "ETG_AllFloorsSafety",
   "Always Doug"                                  : "AlwaysDoug",
   "Auto-Reload"                                  : "AutoReload",
+  "Banker Items"                                 : "BankerItems",
   "BetterShop"                                   : "BetterShop",
   "BlammCo Catalogue"                            : "TF2Stuff",
+  "Botanika Items Version "                      : "BotanikaItems", # note the space at the end D:
   "Brutal Items"                                 : "BrutalItems",
   "Children of Kaliber"                          : "Items",
   "Configurable Healthbars"                      : "Healthbars",
+  "Configurable Rat Chests"                      : "ConfigurableRatChests",
   "Controller Aimer"                             : "ControllerAimer",
   "Custom Characters Mod"                        : "CustomCharacters",
   "Custom Rooms"                                 : "GungeonAPI", # :|
   "CustomItems"                                  : "CustomItems", # Kyle's Custom Items
   "Cut Characters Reborn"                        : "ReturnUnusedCharacters",
+  "DPS Counter"                                  : "DPSMod",
   "Emulate the Gungeon"                          : "EmulateTheGungeon",
   "Equillibrium"                                 : "Equillibrium",
   "ExpandTheGungeon"                             : "ExpandTheGungeon",
@@ -45,11 +51,13 @@ const modToNamespace* : Table[string, string] = {
   "Imposter Items"                               : "ImposterItems", # Crewmate Custom Character
   "Item Blacklist"                               : "ItemBlacklist",
   "ItemTips"                                     : "ItemTipsMod",
+  "Jacket Aesthetic of Vice"                     : "JacketPassiveEnhancement",
   "Jolly Coop"                                   : "JollyCoop",
   "JuneLib"                                      : "JuneLib",
   "Justice"                                      : "Justice",
   "Knife to a Gunfight"                          : "Knives",
   "League of legends Items"                      : "LOLItems",
+  "Lich Items"                                   : "LichItems",
   "Little Guy"                                   : "LittleGuy",
   "Loop The Gungeon"                             : "LoopTheGungeon",
   "Lord's Complementary Compilation"             : "LccMod",
@@ -68,11 +76,14 @@ const modToNamespace* : Table[string, string] = {
   "NoMoreRatCostume"                             : "NoMoreRatCostume",
   "Oddments"                                     : "Oddments",
   "Once More Into The Breach"                    : "NevernamedsItems",
+  "Ordinary Magician Items"                      : "OrdinaryMagicianItems",
   "Planetside Of Gunymede Pre-Release"           : "Planetside",
   "PreventJammedCompanions"                      : "PreventJammedCompanions",
   "Prismatism"                                   : "katmod",
+  "Project GNCC"                                 : "ProjectGNCC",
   "Punchout Anywhere!"                           : "PunchoutAnywhere",
   "Pushing The Limits"                           : "PushingTheLimits",
+  "R&D Ammonomicon"                              : "ETGClasses",
   "R3L0AD"                                       : "Reload", # old version
   "R3L0ADED CONTENT PACK"                        : "Reload",
   "RPGworld mod"                                 : "RPGworldMod",
@@ -84,6 +95,7 @@ const modToNamespace* : Table[string, string] = {
   "Reskin Switcher"                              : "ReskinSwitcherMod",
   "Revive Mod"                                   : "ReviveMod",
   "Room Tool"                                    : "RoomTool",
+  "Science Gun Mad"                              : "ScienceGunMad",
   "Silver Jacket"                                : "SilverJacket",
   "SimpleStats"                                  : "simplestats",
   "SimpleStatsTweaked"                           : "SimpleStatsTweaked",
@@ -93,6 +105,8 @@ const modToNamespace* : Table[string, string] = {
   "Static Cam : BepinEx Edition!"                : "StaticCam",
   "Steamroller"                                  : "Steamroller",
   "SynergyGungeon"                               : "SynergyGungeon",
+  "Tenebrose Items"                              : "TenebroseItems",
+  "The Captain Custom Character"                 : "Captain",
   "The Grin Reaper"                              : "TheGrinReaper",
   "The Hivemind Pack (GCC 1)"                    : "SpecialGunJam2022",
   "The Reference Collection"                     : "Dulsamthings",
@@ -145,13 +159,17 @@ const modTags* : Table[string, seq[string]] = {
   "CustomItems"                         : @[RETIRED],
   "Emulate the Gungeon"                 : @[DISRUPTIVE],        # has a startup failure + other issues that prevent other mods from initializing
   "Frost and Gunfire"                   : @[RETIRED],
+  "Jacket Aesthetic of Vice"            : @[DISRUPTIVE],        # llm generated mod that tanks FPS
+  "JuneLib"                             : @[RETIRED],
   "Oddments"                            : @[RETIRED],
   "Prismatism"                          : @[UNSTABLE, RETIRED],
   "Reloaded HUD"                        : @[OUTDATED, RETIRED], # use SimpleStatsTweaked
   "Revive Mod"                          : @[BROKEN],            # does not use MtGAPI, looks poorly llm-generated, chainload failure (IteratorStateMachineAttribute)
+  "Silver Jacket"                       : @[RETIRED],
   "SimpleStats"                         : @[OUTDATED, RETIRED], # use SimpleStatsTweaked
   "SpecialAPI's Stuff"                  : @[DEPRECATED],
   "SynergyGungeon"                      : @[DISRUPTIVE],        # does very expensive reflected checks in the background constantly
+  "The Reference Collection"            : @[RETIRED],
   "TheGarbageCollector"                 : @[OUTDATED],          # use Gungeon Go Vroom
   "Weapon Wheel Select"                 : @[OUTDATED, RETIRED], # use Weapon Wheel 2
   "[Retrash's] Custom Items Collection" : @[RETIRED],

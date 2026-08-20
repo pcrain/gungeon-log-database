@@ -67,7 +67,8 @@ func processException(db : LogDatabase, plog : ProcessedLog, li : LineBuffer, na
       plog.modsWithRuntimeErrors.incl(err.errorMod)
   plog.totalErrorCount += 1
 
-func processLogLines*(db : LogDatabase, lines : seq[string]) : void =
+func processLog*(db : LogDatabase, logString : string) : void =
+  let lines : seq[string] = logString.splitLinesAndNormalize()
   db.ensureSetup()
 
   var plog : ProcessedLog = ProcessedLog()
@@ -82,7 +83,7 @@ func processLogLines*(db : LogDatabase, lines : seq[string]) : void =
     if plog.gungeonVersion.len == 0 and line.creMatch(db.gungeonVersionRX, matches):
       plog.gungeonVersion = matches[0].strip()
       continue
-    if plog.os.len == 0 and line.creMatch(db.platformRX, matches):
+    if line.creMatch(db.platformRX, matches): # definitive answer that overrides the "Loading mod dir" check below
       plog.os = matches[0]
       continue
     if plog.timestamp.len == 0 and line.creMatch(db.timestampRX, matches):
@@ -98,8 +99,25 @@ func processLogLines*(db : LogDatabase, lines : seq[string]) : void =
       plog.foundOldMTG = true
       continue
     if line.creMatch(db.modRX, matches):
+      if matches[0] == "Steamroller":
+        plog.steamroller = true
       plog.modList.add(createMod(name = matches[0], version = matches[1]))
       continue
+
+    # check for modloader / guess OS if we don't have a definitive answer
+    if "Loading mod dir" in line:
+      if "com.kesomannen.gale" in line:
+        plog.modManager = "Gale"
+      elif "Thunderstore Mod Manager" in line:
+        plog.modManager = "Thunderstore"
+      elif "r2modmanPlus-local" in line:
+        plog.modManager = "R2ModMan"
+
+      if plog.os.len() == 0:
+        if r"AppData\Roaming" in line:
+          plog.os = "Windows"
+        elif r"/home" in line:
+          plog.os = "Linux"
 
     # check for signs of a patched dll
     if "MissingFieldException" in line:
@@ -127,6 +145,7 @@ func processLogLines*(db : LogDatabase, lines : seq[string]) : void =
       db.curPhase = ErrorPhase.runtime
 
   plog.contentsHash = lines.seqMd5()
+  plog.logSize = logString.len()
   db.processedLogs.add(plog)
 
 func lastLog*(db : LogDatabase) : ProcessedLog =

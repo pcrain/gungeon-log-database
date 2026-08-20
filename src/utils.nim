@@ -64,6 +64,10 @@ func goodIfVersionAtLeast*(s : string, m : string) : string =
       return s.inGreen()
   return s.inGreen()
 
+## pretty format a size in bytes
+func formatByteSize*(n : int) : string =
+  return ($n).insertSep(',') & " bytes"
+
 when not defined(js):
   ## string ansi codes from a string
   func stripAnsi*(str: string): string =

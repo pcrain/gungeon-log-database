@@ -8,8 +8,7 @@ import std/times
 import utils
 import log_database
 import processed_log
-
-const VERSION : string = "0.0.1"
+import config
 
 when defined(js):
   import std/dom
@@ -54,9 +53,9 @@ when defined(js):
       return
     let reader = newFileReader()
     reader.onload = proc(ev: Event) =
-      let content = $reader.result
+      let content : string = $reader.result
       var db : LogDatabase = LogDatabase()
-      db.processLogLines(content.splitLinesAndNormalize())
+      db.processLog(content)
       let summary : seq[string] = db.lastLog().summarize()
       # clear other elements
       document.getElementById("prompt").innerHTML = ""
@@ -89,10 +88,10 @@ else:
       return
 
     echo fmt"processing file {infile}"
-    let logLines : seq[string] = infile.readFile().splitLinesAndNormalize()
+    let logLines : string = infile.readFile()
 
     var db : LogDatabase = LogDatabase()
-    db.processLogLines(logLines)
+    db.processLog(logLines)
     let summary : seq[string] = db.lastLog().summarize()
     echo summary.join("\n")
 
