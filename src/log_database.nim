@@ -27,6 +27,7 @@ type
     modRX : Regex # regex for detecting a mod
     exceptionRX : Regex # regex for detecting an exception
     exceptionAltRX : Regex # alternate regex for detecting an exception
+    oldMtgRX : Regex # regex for detecting MTG Classic / ETGMOD
 
 func ensureSetup(db : LogDatabase) : void =
   if db.didSetup:
@@ -42,6 +43,7 @@ func ensureSetup(db : LogDatabase) : void =
   db.modRX            = re"\[Info\s*:\s*BepInEx\] Loading \[(.*) ([0-9]+\.[0-9]+(?:\.[0-9]+)?)\]"
   db.exceptionRX      = re"\[Error\s*:\s*Unity Log\] ([^\s]*Exception)\s*:\s*(.*)"
   db.exceptionAltRX   = re"\[Message\s*:\s*ETG Console\] An error occured when doing ([^\s]+):\s*([^\s]+Exception)\s*: (.*)"
+  db.oldMtgRX         = re"ETGMOD INIT"
 
   # finish up
   db.didSetup = true
@@ -90,6 +92,9 @@ func processLogLines*(db : LogDatabase, lines : seq[string]) : void =
       continue
     if (not plog.foundMTGAPIPatcher) and (line.find(db.patcherRX) >= 0):
       plog.foundMTGAPIPatcher = true
+      continue
+    if (line.find(db.oldMtgRX) >= 0):
+      plog.foundOldMTG = true
       continue
     if line.match(db.modRX, matches):
       plog.modList.add(createMod(name = matches[0], version = matches[1]))

@@ -34,7 +34,7 @@ proc summarize*(plog : ProcessedLog) : void =
     let count : string = fmt"""{$(e.count):>8}"""
     let hash  : string = e.contentHash
     let etype : string = e.errorType
-    let emod  : string = if e.errorNamespace.len() > 0: "in " & e.errorNamespace else : ""
+    let emod  : string = if e.errorNamespace.len() > 0: "from " & e.errorNamespace else : ""
     if e.errorPhase != ErrorPhase.shutdown:
       echo fmt"""  {phase.inGreen()}{(count & " times").inYellow()} {hash.inBlack()} {etype.inCyan()} {emod.inYellow()}"""
       echo e.contents.formatGungeonError(indent = 8)
