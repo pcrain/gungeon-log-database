@@ -7,7 +7,8 @@ type
   ModData* = ref object
     name* : string # name of the mod
     version* : string # version of the mod
-    known* : bool # whether the mod is known
+    known* : bool # whether the mod is a known mod
+    disruptive* : bool # whether the mod is known to be disruptive
     tags* : seq[string] # tags for mod
 
 func createMod*(name : string, version : string) : ModData =
@@ -16,4 +17,5 @@ func createMod*(name : string, version : string) : ModData =
   m.version = version
   m.known = name in modToNamespace
   m.tags = modTags.getOrDefault(name, @[])
+  m.disruptive = (m.tags.len() > 0) and (m.tags[0] == DISRUPTIVE)
   return m

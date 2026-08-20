@@ -37,8 +37,9 @@ proc summarize*(plog : ProcessedLog) : void =
     let hash  : string = e.contentHash
     let etype : string = e.errorType
     let emod  : string = if e.errorMod.len() > 0: ("from " & e.errorMod) else : ""
+    let emodC : string = if e.errorMod.len() > 0: ("from " & e.errorMod.inYellow()) else : ""
     if e.errorPhase != ErrorPhase.shutdown:
-      echo fmt"""  {phase.inGreen()}{(count & " times").inYellow()} {hash.inBlack()} {etype.inCyan()} {emod.inYellow()}"""
+      echo fmt"""  {phase.inGreen()}{(count & " times").inYellow()} {hash.inBlack()} {etype.inCyan()} {emodC}"""
       echo e.contents.formatGungeonError(indent = 8)
     else:
       echo fmt"""  {phase}{count} times {hash} {etype} {emod}""".inBlack()
@@ -53,7 +54,9 @@ proc summarize*(plog : ProcessedLog) : void =
     var ss : string
 
     # determine error state of mod
-    if m.name in plog.modsWithStartupErrors:
+    if m.disruptive: # disruptive mods always get highlighted -- even if they don't cause any errors explicitly, they're probably still to blame
+      ss = s.inCritical()
+    elif m.name in plog.modsWithStartupErrors:
       ss = s.inRed()
     elif m.name in plog.modsWithRuntimeErrors:
       ss = s.inYellow()
