@@ -8,7 +8,7 @@
   "build_systems":
   [
     {
-        "name": "Build and Run",
+        "name": "Build",
         "shell_cmd": "bash $project_path/build.sh ",
         "working_dir": "${project_path}",
         "env": {"CLICOLOR_FORCE": "1",},
@@ -16,8 +16,8 @@
         "syntax": "Packages/ANSIescape/ANSI.sublime-syntax",
     },
     {
-        "name": "Build and Run (Tests Only)",
-        "shell_cmd": "bash $project_path/build.sh -t",
+        "name": "Build JS",
+        "shell_cmd": "bash $project_path/build.sh -j",
         "working_dir": "${project_path}",
         "env": {"CLICOLOR_FORCE": "1",},
         "target": "ansi_color_build",

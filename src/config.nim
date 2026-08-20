@@ -20,6 +20,7 @@ const modToNamespace* : Table[string, string] = {
   "BlammCo Catalogue"                            : "TF2Stuff",
   "Brutal Items"                                 : "BrutalItems",
   "Children of Kaliber"                          : "Items",
+  "Configurable Healthbars"                      : "Healthbars",
   "Controller Aimer"                             : "ControllerAimer",
   "Custom Characters Mod"                        : "CustomCharacters",
   "Custom Rooms"                                 : "GungeonAPI", # :|
@@ -72,6 +73,7 @@ const modToNamespace* : Table[string, string] = {
   "Prismatism"                                   : "katmod",
   "Punchout Anywhere!"                           : "PunchoutAnywhere",
   "Pushing The Limits"                           : "PushingTheLimits",
+  "R3L0AD"                                       : "Reload", # old version
   "R3L0ADED CONTENT PACK"                        : "Reload",
   "RPGworld mod"                                 : "RPGworldMod",
   "Randomised Familiar Shaders"                  : "RandomisedFamiliarShaders",
@@ -87,6 +89,7 @@ const modToNamespace* : Table[string, string] = {
   "SimpleStatsTweaked"                           : "SimpleStatsTweaked",
   "Spawn Specific Chest Command"                 : "SpawnSpecificChestCommand",
   "SpecialAPI's QoL"                             : "QoLMod",
+  "SpecialAPI's Stuff"                           : "SpecialStuffPack",
   "Static Cam : BepinEx Edition!"                : "StaticCam",
   "Steamroller"                                  : "Steamroller",
   "SynergyGungeon"                               : "SynergyGungeon",
@@ -107,6 +110,7 @@ const modToNamespace* : Table[string, string] = {
   "~~ Miku Miku Mod ~~"                          : "MikuMikuMod",
 
   # known mods with conflicting / confusing namespaces
+  "Court of the Crimson King"                    : "Mod",
   "Dax Mod"                                      : "Mod",
   "Quality Colors"                               : "Mod",
   "Remove_LOJ"                                   : "Mod",
@@ -118,7 +122,8 @@ const modToNamespace* : Table[string, string] = {
   # none at the moment :D
 
   # unknown mods that have shown up in logs
-  # none at the moment :D
+  # "Fast Run Dem Commands"                        : "",
+  # "No DPS Cap Mod"                               : "",
 }.toTable()
 
 # reverse the table for a reverse lookup
@@ -126,11 +131,12 @@ const namespaceToMod* : Table[string, string] = modToNamespace.reverseTable()
 
 # tags for various mods
 const RETIRED*     : string = "Retired".inCyan()        # mod author is retired from modding and mod is unlikely to receive updates
-const OUTDATED*    : string = "Outdated".inYellow()     # mod has been replaced by a better alternative and is discouraged from use
+const OUTDATED*    : string = "Outdated".inOrange()     # mod has been replaced by a better alternative and is discouraged from use
 const DEPRECATED*  : string = "Deprecated".inYellow()   # mod is deprecated on Thunderstore and is discouraged from use
 const UNSTABLE*    : string = "Unstable".inMagenta()    # mod has severe problems and is highly discouraged from use
 const BROKEN*      : string = "Broken".inRed()          # mod does not do what it advertises and is advised to immediately be uninstalled until fixed
-const DISRUPTIVE*  : string = "Disruptive".inCritical() # mod actively disrupts gameplay / othermods and is advised to immediately be uninstalled until fixed
+const DISRUPTIVE*  : string = "Disruptive".inCritical() # mod actively disrupts normal gameplay / other mods and is advised to immediately be uninstalled until fixed
+const MALWARE*     : string = "Malware".inDanger()      # mod is known to be malware and is advisted to immediately be uninstalled
 
 # tag lookup table for mods
 const modTags* : Table[string, seq[string]] = {
@@ -144,6 +150,7 @@ const modTags* : Table[string, seq[string]] = {
   "Reloaded HUD"                        : @[OUTDATED, RETIRED], # use SimpleStatsTweaked
   "Revive Mod"                          : @[BROKEN],            # does not use MtGAPI, looks poorly llm-generated, chainload failure (IteratorStateMachineAttribute)
   "SimpleStats"                         : @[OUTDATED, RETIRED], # use SimpleStatsTweaked
+  "SpecialAPI's Stuff"                  : @[DEPRECATED],
   "SynergyGungeon"                      : @[DISRUPTIVE],        # does very expensive reflected checks in the background constantly
   "TheGarbageCollector"                 : @[OUTDATED],          # use Gungeon Go Vroom
   "Weapon Wheel Select"                 : @[OUTDATED, RETIRED], # use Weapon Wheel 2

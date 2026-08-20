@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gungen Log Analyzer</title>
+  <style>
+      body {
+        font-family: monospace; font-size: 12pt;
+        color: white;
+        background-color: rgb(30, 30, 30) ;
+      }
+      .d { font-weight: bold; color: dimgray; }
+      .r { font-weight: bold; color: red; }
+      .o { font-weight: bold; color: orange; }
+      .g { font-weight: bold; color: lime; }
+      .y { font-weight: bold; color: yellow; }
+      .b { font-weight: bold; color: blue; }
+      .m { font-weight: bold; color: magenta; }
+      .c { font-weight: bold; color: cyan; }
+      .x { font-weight: bold; color: white; background-color: maroon; }
+      .v { font-weight: bold; color: black; background-color: lime; }
+      .h { font-weight: bold; color: white; font-size: 20pt; }
+      #download-button, #upload-button::file-selector-button {
+        background-color : rgb(0, 0, 255);
+        color            : white;
+        padding          : 10px 20px;
+        margin           : 4px;
+        border           : none;
+        border-radius    : 6px;
+        font-weight      : bold;
+        cursor           : pointer;
+        transition       : background-color 0.2s ease-in-out;
+      }
+      #download-button:hover, #upload-button::file-selector-button:hover {
+        color: black;
+        background-color: rgb(200, 200, 255);
+      }
+      th {
+        text-align: center;
+      }
+      table, th, td {
+        border: 1px solid white;
+        border-collapse: collapse;
+        padding: 4px 8px;
+      }
+  </style>
+</head>
+<body>
+  <div id="prompt">Click the buttom below to upload a Gungeon output log for analysis:</div>
+  <input type="file" id="upload-button" />
+  <button id="download-button" style="display: none;">
+    Download Report
+  </button>
+  <pre id="output"></pre>
+  <script src="analyzer.min.js"></script> <!-- Compiled output from Nim -->
+  <div id="legend">
+    <hr/>
+    <p>Description of Mod List Colors:</p>
+    <ul>
+      <li>Mods highlighted <span class=y>in yellow</span> had runtime errors and may be interfering with gameplay</li>
+      <li>Mods highlighted <span class=r>in red</span> had startup errors, probably aren't functioning correctly, and may be interfering with other mods</li>
+      <li>Mods highlighted <span class=x>in red and white</span> are known to be disruptive and are almost certainly causing errors with other mods</li>
+      <li>Mods highlighted <span class=m>in magenta</span> are unrecognized by the mod database</li>
+    </ul>
+    <hr/>
+    <p>Description of Mod Tags:</p>
+    <table>
+      <tr><th>Tag</th><th>Description</th><th>Recommended Action</th></tr>
+      <tr><td><span class=c>Retired</span></td>    <td>the mod's author is retired from modding</td><td>fine to use, but bugs likely won't be fixed</td></tr>
+      <tr><td><span class=o>Outdated</span></td>   <td>the mod has been replaced by a better alternative</td><td>switch to alternative or use at own risk</td></tr>
+      <tr><td><span class=y>Deprecated</span></td> <td>the mod is deprecated on Thunderstore</td><td><span class=y>highly discouraged from use</span></td></tr>
+      <tr><td><span class=m>Unstable</span></td>   <td>the mod has severe problems that are unlikely to be fixed</td><td><span class=y>highly discouraged from use</span></td></tr>
+      <tr><td><span class=r>Broken</span></td>     <td>the mod does not function as advertised</td><td><span class=r>uninstall immediately</span></td></tr>
+      <tr><td><span class=x>Disruptive</span></td> <td>the mod actively disrupts normal gameplay and/or breaks other mods</td><td> <span class=r>uninstall immediately</span></td></tr>
+      <tr><td><span class=v>Malware</span></td>    <td>the mod is known to be malware</td><td><span class=r>uninstall immediately</span></td></tr>
+    </table>
+  </div>
+  <div style="font-family: monospace; white-space: pre;" id="log-summary">
+  </div>
+</body>
+</html>

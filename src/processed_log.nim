@@ -10,6 +10,11 @@ import utils
 
 import config
 
+when defined(js):
+  const DIVIDER : string = "<hr/>"
+else:
+  const DIVIDER : string = "-----------"
+
 # class designating data extracted from a single processed log
 type
   ProcessedLog* = ref object
@@ -29,32 +34,52 @@ type
     modsWithStartupErrors* : HashSet[string] # mods that have startup errors
     modsWithRuntimeErrors* : HashSet[string] # mods that have runtime errors
 
-proc summarize*(plog : ProcessedLog) : void =
-  echo fmt"""Error List:"""
-  for e in plog.errorList:
-    let phase : string = fmt"""{$(e.errorPhase):<10}"""
-    let count : string = fmt"""{$(e.count):>8}"""
-    let hash  : string = e.contentHash
-    let etype : string = e.errorType
-    let emod  : string = if e.errorMod.len() > 0: ("from " & e.errorMod) else : ""
-    let emodC : string = if e.errorMod.len() > 0: ("from " & e.errorMod.inYellow()) else : ""
-    if e.errorPhase != ErrorPhase.shutdown:
-      echo fmt"""  {phase.inGreen()}{(count & " times").inYellow()} {hash.inBlack()} {etype.inCyan()} {emodC}"""
-      echo e.contents.formatGungeonError(indent = 8)
-    else:
-      echo fmt"""  {phase}{count} times {hash} {etype} {emod}""".inBlack()
+func addHeader(summary : var seq[string], header : string) : void =
+  when defined(js):
+    summary.add(DIVIDER & "<span class=h>" & header & "</span>" & DIVIDER)
+  else:
+    summary.add(DIVIDER)
+    summary.add(header & ":")
 
+func addOverview(plog: ProcessedLog, summary : var seq[string]) : void =
+  summary.addHeader("Overview")
+
+  summary.add(fmt"""Log Date:           {plog.timestamp.warnIfEmpty("Unknown")}""")
+  summary.add(fmt"""Log Hash:           {plog.contentsHash}""")
+  summary.add(fmt"""Operating System:   {plog.os.warnIfEmpty("Unknown")}""")
+  if plog.gungeonVersion.len() == 0:
+    summary.add(fmt"""Gungeon Version:    {"Unknown".inMagenta()}""")
+  else:
+    summary.add(fmt"""Gungeon Version:    {plog.gungeonVersion.terribleIfNotMatches("2.1.9", " (mods only support 2.1.9)")}""")
+  summary.add(fmt"""BepInEx Version:    {plog.bepinexVersion.goodIfVersionAtLeast("5.4.21.0")}""")
+  if plog.platformInterface.len() == 0:
+    summary.add(fmt"""Platform Interface: {"Unknown".inMagenta()}""")
+  else:
+    summary.add(fmt"""Platform Interface: {(plog.platformInterface.goodIfMatchesElseNeutral("Steam"))}""")
+  summary.add(fmt"""MTG API Patcher:    {(plog.foundMTGAPIPatcher.terribleIfNotFound(" (most mods will not work without MTGAPIPatcher.mm.dll)"))}""")
+  summary.add(fmt"""MTG Classic:        {(plog.foundOldMTG.terribleIfFound(" (MTG classic is deprecated and incompatible with BepInEx / Thunderstore mods)"))}""")
+  if plog.platformInterface == "Steam":
+    summary.add(fmt"""Modified DLL:       {(plog.patchedDll.terribleIfYes(" (Assembly-CSharp.dll has been modified, verify integrity of game files through Steam)"))}""")
+  else:
+    summary.add(fmt"""Modified DLL:       {(plog.patchedDll.terribleIfYes(" (Assembly-CSharp.dll has been modified, restore the original version or reinstall the game)"))}""")
+  summary.add(fmt"""Mods Installed:     {plog.modList.len()}""")
+  summary.add(fmt"""Total Errors:       {plog.totalErrorCount}""")
+  summary.add(fmt"""Unique Errors:      {plog.errorList.len()}""")
+
+func addModList(plog: ProcessedLog, summary : var seq[string]) : void =
+  summary.addHeader("Mods Loaded")
   let modList : seq[ModData] = plog.modList.toSeq().sortedByIt(it.name)
-  let modNameLength : int = 2 + modList.mapIt(it.name.len()).foldl(max(a, b))
-  let modNamespaceLength : int = 4 + modList.mapIt(modToNamespace.getOrDefault(it.name, "").len()).foldl(max(a, b))
-  echo fmt"""Mods Loaded:"""
+  let modNameLength : int = 2 + modList.mapIt(it.name.len()).foldl(max(a, b), 0)
+  let modNamespaceLength : int = 4 + modList.mapIt(modToNamespace.getOrDefault(it.name, "").len()).foldl(max(a, b), 0)
   for m in modList:
     let s : string = fmt"""  {m.version:>10} {m.name.alignLeft(modNameLength)}"""
-    let namespace : string = ("[" & modToNamespace.getOrDefault(m.name, if m.known: "unknown namespace" else: " [unknown mod]") & "]").alignLeft(modNamespaceLength)
+    let namespace : string = ("[" & modToNamespace.getOrDefault(m.name, if m.known: "unknown namespace" else: "unknown mod") & "]").alignLeft(modNamespaceLength)
     var ss : string
 
     # determine error state of mod
-    if m.disruptive: # disruptive mods always get highlighted -- even if they don't cause any errors explicitly, they're probably still to blame
+    if m.malware: # malware mods always get highlighted -- even if they don't cause any errors explicitly, they're probably still to blame
+      ss = s.inDanger()
+    elif m.disruptive: # disruptive mods always get highlighted -- even if they don't cause any errors explicitly, they're probably still to blame
       ss = s.inCritical()
     elif m.name in plog.modsWithStartupErrors:
       ss = s.inRed()
@@ -73,18 +98,36 @@ proc summarize*(plog : ProcessedLog) : void =
 
     # fetch tags for mod
     ss &= m.tags.join(", ")
-    echo ss
+    summary.add(ss)
 
-  echo fmt"""-----------"""
-  echo fmt"""Log Date:           {plog.timestamp}"""
-  echo fmt"""Log Hash:           {plog.contentsHash}"""
-  echo fmt"""Operating System:   {plog.os}"""
-  echo fmt"""Gungeon Version:    {plog.gungeonVersion.goodIfMatches("2.1.9")}"""
-  echo fmt"""BepInEx Version:    {plog.bepinexVersion.goodIfVersionAtLeast("5.4.21.0")}"""
-  echo fmt"""Platform Interface: {(plog.platformInterface.goodIfMatchesElseNeutral("Steam"))}"""
-  echo fmt"""MTG API Patcher:    {(plog.foundMTGAPIPatcher.goodIfFound())}"""
-  echo fmt"""MTG Classic:        {(plog.foundOldMTG.badIfFound())}"""
-  echo fmt"""Modified DLL:       {(plog.patchedDll.badIfYes())}"""
-  echo fmt"""Mods Installed:     {plog.modList.len()}"""
-  echo fmt"""Total Errors:       {plog.totalErrorCount}"""
-  echo fmt"""Unique Errors:      {plog.errorList.len()}"""
+func addErrorList(plog: ProcessedLog, summary : var seq[string]) : void =
+  summary.addHeader("Error List")
+  for e in plog.errorList:
+    let phase : string = fmt"""{$(e.errorPhase)}"""
+    let count : string = if e.count > 1: fmt"""({e.count} times)""" else: ""
+    when defined(js):
+      let hash  : string = ""
+    else:
+      let hash  : string = " " & e.contentHash
+    let etype : string = e.errorType
+    let emod  : string = if e.errorMod.len() > 0: ("from " & e.errorMod & " ") else : ""
+    let emodC : string = if e.errorMod.len() > 0: ("from " & e.errorMod.inYellow() & " ") else : ""
+    if e.errorPhase != ErrorPhase.shutdown:
+      summary.add(fmt"""  {phase.inGreen()}{hash.inBlack()} {etype.inCyan()} {emodC}{count.inOrange()}""")
+      summary.add(e.contents.formatGungeonError(indent = 8))
+    else:
+      summary.add(fmt"""  {phase}{hash} {etype} {emod}{count}""".inBlack())
+
+proc summarize*(plog : ProcessedLog) : seq[string] =
+  var summary : seq[string]
+
+  when defined(js): # overview on top for web version
+    plog.addOverview(summary)
+    plog.addModList(summary)
+    plog.addErrorList(summary)
+  else: # overview on bottom for console version
+    plog.addErrorList(summary)
+    plog.addModList(summary)
+    plog.addOverview(summary)
+
+  return summary

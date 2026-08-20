@@ -9,6 +9,7 @@ type
     version* : string # version of the mod
     known* : bool # whether the mod is a known mod
     disruptive* : bool # whether the mod is known to be disruptive
+    malware* : bool # whether the mod is known to be malware
     tags* : seq[string] # tags for mod
 
 func createMod*(name : string, version : string) : ModData =
@@ -18,4 +19,5 @@ func createMod*(name : string, version : string) : ModData =
   m.known = name in modToNamespace
   m.tags = modTags.getOrDefault(name, @[])
   m.disruptive = (m.tags.len() > 0) and (m.tags[0] == DISRUPTIVE)
+  m.malware = (m.tags.len() > 0) and (m.tags[0] == MALWARE)
   return m

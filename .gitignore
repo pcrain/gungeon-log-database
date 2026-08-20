@@ -1,2 +1,4 @@
 gld
 *.sublime-workspace
+*~
+analyzer.js
