@@ -35,7 +35,7 @@ proc summarize*(plog : ProcessedLog) : void =
     let count : string = fmt"""{$(e.count):>8}"""
     let hash  : string = e.contentHash
     let etype : string = e.errorType
-    let emod  : string = if e.errorMod.len() > 0: "from " & e.errorMod else : ""
+    let emod  : string = if e.errorMod.len() > 0: ("from " & e.errorMod) else : ""
     if e.errorPhase != ErrorPhase.shutdown:
       echo fmt"""  {phase.inGreen()}{(count & " times").inYellow()} {hash.inBlack()} {etype.inCyan()} {emod.inYellow()}"""
       echo e.contents.formatGungeonError(indent = 8)
@@ -44,10 +44,14 @@ proc summarize*(plog : ProcessedLog) : void =
 
   let modList : seq[ModData] = plog.modList.toSeq().sortedByIt(it.name)
   let modNameLength : int = 2 + modList.mapIt(it.name.len()).foldl(max(a, b))
+  let modNamespaceLength : int = 4 + modList.mapIt(modToNamespace.getOrDefault(it.name, "").len()).foldl(max(a, b))
   echo fmt"""Mods Loaded:"""
   for m in modList:
     let s : string = fmt"""  {m.version:>10} {m.name.alignLeft(modNameLength)}"""
+    let namespace : string = ("[" & modToNamespace.getOrDefault(m.name, if m.known: "unknown namespace" else: " [unknown mod]") & "]").alignLeft(modNamespaceLength)
     var ss : string
+
+    # determine error state of mod
     if m.name in plog.modsWithStartupErrors:
       ss = s.inRed()
     elif m.name in plog.modsWithRuntimeErrors:
@@ -56,8 +60,15 @@ proc summarize*(plog : ProcessedLog) : void =
       ss = s.inMagenta()
     else:
       ss = s
-    if not m.known:
-      ss = ss & " [unknown mod]".inMagenta()
+
+    # determine known state of mod
+    if m.known:
+      ss &= namespace.inBlack()
+    else:
+      ss &= namespace.inMagenta()
+
+    # fetch tags for mod
+    ss &= m.tags.join(", ")
     echo ss
 
   echo fmt"""-----------"""

@@ -83,3 +83,13 @@ func goodIfVersionAtLeast*(s : string, m : string) : string =
     if ss[i] > ms[i]:
       return s.inGreen()
   return s.inGreen()
+
+
+## string ansi codes from a string
+func stripAnsi*(str: string): string =
+  let ansiRegex = re"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]"
+  return str.replace(ansiRegex, "")
+
+## get the length of an ansi-colored string after stripping the colors away
+func lenSansColors(s : string) : int =
+  return s.stripAnsi().len()

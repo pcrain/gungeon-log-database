@@ -37,7 +37,8 @@ func readException*(li : LineBuffer) : GungeonError =
       continue
     if line[0] == '[': # lines beginning with a '[' mark an entirely new issue, so if we encounter it past the first line, that's a new error
       break
-    if err.errorMod.len() == 0:
+    # check the mod the error is a part of, first looking up known mods, then falling back to namespaces
+    if err.errorMod.len() == 0 and not ("Stack trace" in line):
       let namespace : string = line.split(".")[0].strip().dup(removePrefix("at ")).strip()
       if namespace in namespaceToMod:
         err.errorMod = namespaceToMod[namespace]
