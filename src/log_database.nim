@@ -59,11 +59,11 @@ func processException(db : LogDatabase, plog : ProcessedLog, li : LineBuffer, na
     plog.uniqueErrors[errHash] = err
     plog.errorList.add(err)
   var s : HashSet[string]
-  if err.errorNamespace.len() > 0:
+  if err.errorMod.len() > 0:
     if db.curPhase == ErrorPhase.startup:
-      plog.modsWithStartupErrors.incl(err.errorNamespace)
+      plog.modsWithStartupErrors.incl(err.errorMod)
     elif db.curPhase == ErrorPhase.runtime:
-      plog.modsWithRuntimeErrors.incl(err.errorNamespace)
+      plog.modsWithRuntimeErrors.incl(err.errorMod)
   plog.totalErrorCount += 1
 
 func processLogLines*(db : LogDatabase, lines : seq[string]) : void =

@@ -19,7 +19,7 @@ type
   GungeonError* = ref object
     errorPhase* : ErrorPhase # when the error occurred for the first time within a specific log file
     errorType* : string # type of exception / error that occurred
-    errorNamespace* : string # namespace of the mod implicated by the error
+    errorMod* : string # mod implicated by the error
     contents* : string # the raw contents of the error
     contentHash* : string # the hash of the raw contents of the error
     count* : int # number of times the error has occurred (mostly used by ProcessedLog)
@@ -37,10 +37,10 @@ func readException*(li : LineBuffer) : GungeonError =
       continue
     if line[0] == '[': # lines beginning with a '[' mark an entirely new issue, so if we encounter it past the first line, that's a new error
       break
-    if err.errorNamespace.len() == 0:
+    if err.errorMod.len() == 0:
       let namespace : string = line.split(".")[0].strip().dup(removePrefix("at ")).strip()
-      if namespace in confNamespaceMap:
-        err.errorNamespace = confNamespaceMap[namespace]
+      if namespace in namespaceToMod:
+        err.errorMod = namespaceToMod[namespace]
       # see if we can determine the namespace of the source of the error
     lines.add(line)
   err.contents = lines.join("\n")

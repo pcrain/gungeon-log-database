@@ -2,6 +2,7 @@ import mod_data
 import gungeon_error
 import std/strformat
 import std/sequtils
+import std/strutils
 import std/algorithm
 import std/tables
 import std/sets
@@ -34,22 +35,30 @@ proc summarize*(plog : ProcessedLog) : void =
     let count : string = fmt"""{$(e.count):>8}"""
     let hash  : string = e.contentHash
     let etype : string = e.errorType
-    let emod  : string = if e.errorNamespace.len() > 0: "from " & e.errorNamespace else : ""
+    let emod  : string = if e.errorMod.len() > 0: "from " & e.errorMod else : ""
     if e.errorPhase != ErrorPhase.shutdown:
       echo fmt"""  {phase.inGreen()}{(count & " times").inYellow()} {hash.inBlack()} {etype.inCyan()} {emod.inYellow()}"""
       echo e.contents.formatGungeonError(indent = 8)
     else:
       echo fmt"""  {phase}{count} times {hash} {etype} {emod}""".inBlack()
 
+  let modList : seq[ModData] = plog.modList.toSeq().sortedByIt(it.name)
+  let modNameLength : int = 2 + modList.mapIt(it.name.len()).foldl(max(a, b))
   echo fmt"""Mods Loaded:"""
-  for m in plog.modList.toSeq().sortedByIt(it.name):
-    let s : string = fmt"""  {m.version:>10} {m.name}"""
+  for m in modList:
+    let s : string = fmt"""  {m.version:>10} {m.name.alignLeft(modNameLength)}"""
+    var ss : string
     if m.name in plog.modsWithStartupErrors:
-      echo s.inRed()
+      ss = s.inRed()
     elif m.name in plog.modsWithRuntimeErrors:
-      echo s.inYellow()
+      ss = s.inYellow()
+    elif not m.known:
+      ss = s.inMagenta()
     else:
-      echo s
+      ss = s
+    if not m.known:
+      ss = ss & " [unknown mod]".inMagenta()
+    echo ss
 
   echo fmt"""-----------"""
   echo fmt"""Log Date:           {plog.timestamp}"""
