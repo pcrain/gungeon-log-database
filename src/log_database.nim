@@ -34,7 +34,7 @@ func ensureSetup(db : LogDatabase) : void =
     return
 
   # set up regular expressions
-  db.gungeonVersionRX = re"\[Info\s*:\s*Unity Log\] Version: ([0-9\.]+)"
+  db.gungeonVersionRX = re"\[Info\s*:\s*Unity Log\] Version: ([0-9h\.]+)"
   db.bepinexVersionRX = re"\[Message\s*:\s*BepInEx\] BepInEx ([0-9\.]+) - .*"
   db.platformRX       = re"\[Info\s*:\s*BepInEx\] System platform: (.*)\s*"
   db.timestampRX      = re"\[Info\s*:\s*Unity Log\] Now: (.*)\s*"
@@ -99,6 +99,11 @@ func processLogLines*(db : LogDatabase, lines : seq[string]) : void =
     if line.match(db.modRX, matches):
       plog.modList.add(createMod(name = matches[0], version = matches[1]))
       continue
+
+    # check for signs of a patched dll
+    if "MissingFieldException" in line:
+      plog.patchedDll = true
+
     # two error variants: first catches startup error wrapped in try-catch blocks, second catches normal exceptions
     if line.match(db.exceptionAltRX, matches):
       db.processException(plog = plog, li = li.back(), name = matches[1], message = matches[2])

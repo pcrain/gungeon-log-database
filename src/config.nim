@@ -16,12 +16,15 @@ const modToNamespace* : Table[string, string] = {
   "All Floors Safety"                            : "ETG_AllFloorsSafety",
   "Always Doug"                                  : "AlwaysDoug",
   "Auto-Reload"                                  : "AutoReload",
+  "BetterShop"                                   : "BetterShop",
+  "BlammCo Catalogue"                            : "TF2Stuff",
   "Brutal Items"                                 : "BrutalItems",
   "Children of Kaliber"                          : "Items",
   "Custom Characters Mod"                        : "CustomCharacters",
   "Custom Rooms"                                 : "GungeonAPI", # :|
   "CustomItems"                                  : "CustomItems", # Kyle's Custom Items
   "Cut Characters Reborn"                        : "ReturnUnusedCharacters",
+  "Emulate the Gungeon"                          : "EmulateTheGungeon",
   "Equillibrium"                                 : "Equillibrium",
   "ExpandTheGungeon"                             : "ExpandTheGungeon",
   "Expanded Bossfights"                          : "ExpandBosses",
@@ -34,6 +37,7 @@ const modToNamespace* : Table[string, string] = {
   "Gungeon Cult of the Lamb"                     : "GungeonCOTL",
   "GungeonCraft"                                 : "CwaffingTheGungy",
   "GungeonGoVroom"                               : "GGV",
+  "GungeonLogArchiver"                           : "GungeonLogArchiver",
   "GungeonUnstuck"                               : "GungeonUnstuck",
   "Hat Loader"                                   : "HatLoader",
   "Item Blacklist"                               : "ItemBlacklist",
@@ -54,11 +58,13 @@ const modToNamespace* : Table[string, string] = {
   "Modular Custom Character"                     : "ModularMod",
   "More Map Icons"                               : "MoreMapIcons",
   "Nerfed Mini Dragun"                           : "NerfedBabyDragun",
+  "No Blasphemy Beam Shader"                     : "GungeonNoBlasphemyBeamShader",
   "No Brain"                                     : "NoBrain",
   "NoMoreRatCostume"                             : "NoMoreRatCostume",
   "Oddments"                                     : "Oddments",
   "Once More Into The Breach"                    : "NevernamedsItems",
   "Planetside Of Gunymede Pre-Release"           : "Planetside",
+  "PreventJammedCompanions"                      : "PreventJammedCompanions",
   "Prismatism"                                   : "katmod",
   "Punchout Anywhere!"                           : "PunchoutAnywhere",
   "Pushing The Limits"                           : "PushingTheLimits",
@@ -75,15 +81,19 @@ const modToNamespace* : Table[string, string] = {
   "SimpleStatsTweaked"                           : "SimpleStatsTweaked",
   "Spawn Specific Chest Command"                 : "SpawnSpecificChestCommand",
   "SpecialAPI's QoL"                             : "QoLMod",
+  "Steamroller"                                  : "Steamroller",
   "The Reference Collection"                     : "Dulsamthings",
   "TheGarbageCollector"                          : "TheGarbageCollector",
   "TheRatPack"                                   : "TheRatPack",
   "The_Minstrel"                                 : "Minstrel",
+  "Unfinish the Gun"                             : "UnfinishTheGun",
+  "Vammopires"                                   : "Vammopires",
   "Weapon Wheel Select"                          : "RadialGunSelect",
   "What Gun Class Is It From (Bepinex Edition!)" : "WhatGunClassIsItFrom",
   "What Mod Is This From (WMITF)"                : "WMITF",
   "[Retrash's] Custom Items Collection"          : "Blunderbeast",
   "[[ AmmonomiconAPI ]]"                         : "AmmonomiconAPI",
+  "~~ Miku Miku Mod ~~"                          : "MikuMikuMod",
 
   # known mods with conflicting / confusing namespaces
   "Quality Colors"                               : "Mod",
@@ -94,24 +104,28 @@ const modToNamespace* : Table[string, string] = {
 
   # known mods with unknown namespaces
   # none at the moment :D
+
+  # unknown mods that have shown up in logs
+  # "Zoom Camera"                                  : "",
 }.toTable()
 
 # reverse the table for a reverse lookup
 const namespaceToMod* : Table[string, string] = modToNamespace.reverseTable()
 
 # tags for various mods
-const RETIRED     : string = "Retired".inCyan()       # mod author is retired from modding and mod is unlikely to receive updates
-const OUTDATED    : string = "Outdated".inYellow()    # mod has been replaced by a better alternative and is discouraged from use
-const DEPRECATED  : string = "Deprecated".inYellow()  # mod is deprecated on Thunderstore and is discouraged from use
-const UNSTABLE    : string = "Unstable".inMagenta()   # mod has severe problems and is highly discouraged from use
-const BROKEN      : string = "Broken".inRed()         # mod does not do what it advertises and is actively discouraged from use
-const DISRUPTIVE  : string = "Disruptive".inRed()     # mod actively disrupts gameplay / othermods and is advised to immediately be uninstalled
+const RETIRED     : string = "Retired".inCyan()        # mod author is retired from modding and mod is unlikely to receive updates
+const OUTDATED    : string = "Outdated".inYellow()     # mod has been replaced by a better alternative and is discouraged from use
+const DEPRECATED  : string = "Deprecated".inYellow()   # mod is deprecated on Thunderstore and is discouraged from use
+const UNSTABLE    : string = "Unstable".inMagenta()    # mod has severe problems and is highly discouraged from use
+const BROKEN      : string = "Broken".inRed()          # mod does not do what it advertises and is advised to immediately be uninstalled until fixed
+const DISRUPTIVE  : string = "Disruptive".inCritical() # mod actively disrupts gameplay / othermods and is advised to immediately be uninstalled until fixed
 
 # tag lookup table for mods
 const modTags* : Table[string, seq[string]] = {
   "Auto-Reload"                         : @[OUTDATED],          # use Gunfig
   "Children of Kaliber"                 : @[RETIRED],
   "CustomItems"                         : @[RETIRED],
+  "Emulate the Gungeon"                 : @[DISRUPTIVE],
   "Frost and Gunfire"                   : @[RETIRED],
   "Oddments"                            : @[RETIRED],
   "Prismatism"                          : @[UNSTABLE, RETIRED],

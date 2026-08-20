@@ -6,8 +6,11 @@ func inYellow*(s : string) : string = "\e[33;1m" & s & "\e[0m"
 func inBlue*(s : string) : string = "\e[34;1m" & s & "\e[0m"
 func inMagenta*(s : string) : string = "\e[35;1m" & s & "\e[0m"
 func inCyan*(s : string) : string = "\e[36;1m" & s & "\e[0m"
+func inCritical*(s : string) : string = "\e[41;1m" & s & "\e[0m"
 func goodIfFound*(found : bool) : string = (if found: "Found".inGreen() else: "Not Found".inRed())
 func badIfFound*(found : bool) : string = (if found: "Found".inRed() else: "Not Found".inGreen())
 func goodIfMatches*(s : string, m : string) : string = (if s == m: s.inGreen() else: s.inRed())
+func goodIfMatchesElseNeutral*(s : string, m : string) : string = (if s == m: s.inGreen() else: s.inCyan())
 func badIfMatches*(s : string, m : string) : string = (if s != m: s.inGreen() else: s.inRed())
 func badIfTrue*(s : string, b : bool) : string = (if b: s.inRed() else: s)
+func badIfYes*(b : bool) : string = (if b: "Yes".inRed() else: "No".inGreen())
